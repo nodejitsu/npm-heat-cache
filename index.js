@@ -29,7 +29,7 @@ function PreHeat (options) {
 
   this.githulk = new Githulk({
     cache: new Dynamis('cradle', this.cradle, options.couchdb),
-    token: options.tokens
+    tokens: options.tokens
   });
 
   this.redis.on('error', this.emit.bind(this, 'error'));
