@@ -1,0 +1,11 @@
+{
+  "name": "npm-heat-cache",
+  "version": "0.0.0",
+  "description": "simple module that allows you to insert the necessary items into redis/couchdb for packages-pagelet to use",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Nodejitsu Inc. <info@nodejitsu.com>",
+  "license": "MIT"
+}
