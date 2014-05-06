@@ -1,6 +1,6 @@
 {
   "name": "npm-heat-cache",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "simple module that allows you to insert the necessary items into redis/couchdb for packages-pagelet to use",
   "main": "index.js",
   "scripts": {
