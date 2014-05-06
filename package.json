@@ -4,5 +4,13 @@
   "description": "simple module that allows you to insert the necessary items into redis/couchdb for packages-pagelet to use",
   "main": "index.js",
   "author": "Nodejitsu Inc. <info@nodejitsu.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "cradle": "~0.6.7",
+    "dynamis": "~0.1.3",
+    "githulk": "0.0.x",
+    "npm-registry": "~0.1.8",
+    "packages-pagelet": "~0.5.2",
+    "redis": "~0.10.1"
+  }
 }
