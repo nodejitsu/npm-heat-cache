@@ -1,7 +1,8 @@
 # npm-heat-cache
 
 Simple wrapper around the pagelet resolve function in order to preheat the
-cache.
+cache. Getting data for a package page can consume a lot of resources. Each
+resolved package can take up to 10 token requests.
 
 Most of the code logic is courtesy of @swaagie
 
@@ -15,6 +16,7 @@ var options = {
   tokens: ['some github tokens'],
   registry: 'https://registry.nodejitsu.com'
 };
+
 //
 // Create a preheat intance
 //
