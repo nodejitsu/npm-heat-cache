@@ -49,28 +49,36 @@ function PreHeat (options) {
 
 //
 // Take the package name, resolve it and its dependencies and cache it.
+// Allow a registry host to also be passed in
 //
-PreHeat.prototype.cache = function (package, callback) {
+PreHeat.prototype.cache = function (package, host, callback) {
+  if (!callback && typeof host === 'function') {
+    callback = host;
+    host = undefined;
+  }
+
   this._callback = callback && typeof callback === 'function'
     ? callback
     : undefined;
 
-  this.pagelet.latest(package, this._onLatest.bind(this, package));
+  this.pagelet.latest(package, this._onLatest.bind(this, package, host));
 };
 
-PreHeat.prototype._onLatest = function (package, err, version) {
+PreHeat.prototype._onLatest = function (package, host, err, version) {
   if (err) { return onError(err); }
   var key = this.pagelet.key(package, version);
 
-  this.pagelet.fireforget('get', key, this._onFetch.bind(this, key, package));
+  this.pagelet.fireforget('get', key, this._onFetch.bind(this, key, package, host));
 };
 
-PreHeat.prototype._onFetch = function (key, package, err, data) {
+PreHeat.prototype._onFetch = function (key, package, host, err, data) {
   if (err) { return this.onError(err) }
   if (!err && data) { return this.done() }
 
+  // Allow host to override the registry instance so a new one is created
+  // with the proper URL
   this.pagelet.resolve(package, {
-    registry: this.registry,
+    registry: host || this.registry,
     githulk: this.githulk
   }, this._onResolved.bind(this, key));
 };
