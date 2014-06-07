@@ -28,7 +28,7 @@ function PreHeat (options) {
                                   { auth_pass: options.redis.auth });
 
   this.githulk = new Githulk({
-    cache: new Dynamis('cradle', this.cradle, options.couchdb),
+    cache: new Dynamis('cradle', this.couchdb, options.couchdb),
     tokens: options.tokens
   });
 
@@ -46,7 +46,7 @@ function PreHeat (options) {
   }).optimize());
 
 }
-i
+
 //
 // Take the package name, resolve it and its dependencies and cache it.
 //
