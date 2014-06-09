@@ -9,5 +9,9 @@ preheat.on('error', function (err) {
 });
 
 preheat.cache('primus', function (err, data) {
+    if (err) {
+      console.error(err);
+      process.exit(1);
+    }
     process.exit(0);
 });
