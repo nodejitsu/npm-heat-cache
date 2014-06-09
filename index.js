@@ -38,7 +38,10 @@ function PreHeat (options) {
     githulk: this.githulk,
     registry: options.registry
   });
-  this.prefix = '';
+
+  this.prefix = options.private
+    ? options.registry + ':private:'
+    : '';
 
   this.pagelet = new (Pagelet.extend({
     cache: new Dynamis('redis', this.redis, options.redis),
@@ -57,34 +60,22 @@ PreHeat.prototype.key = function (name, version) {
 // Take the package name, resolve it and its dependencies and cache it.
 // Allow a registry host to also be passed in
 //
-PreHeat.prototype.cache = function (package, host, callback) {
-  if (!callback && typeof host === 'function') {
-    callback = host;
-    host = undefined;
-  }
-  if (host) {
-    this.registry = new Registry({
-      githulk: this.githulk,
-      registry: host
-    });
-    this.prefix += host + ':private:';
-    this.pagelet.registry = this.registry;
-  }
+PreHeat.prototype.cache = function (package, callback) {
   this._callback = callback && typeof callback === 'function'
     ? callback
     : undefined;
 
-  this.pagelet.latest(package, this._onLatest.bind(this, package, host));
+  this.pagelet.latest(package, this._onLatest.bind(this, package));
 };
 
-PreHeat.prototype._onLatest = function (package, host, err, version) {
+PreHeat.prototype._onLatest = function (package, err, version) {
   if (err) { return this.onError(err); }
   var key = this.pagelet.key(package, version);
-
-  this.pagelet.fireforget('get', key, this._onFetch.bind(this, key, package, host));
+  console.log(key);
+  this.pagelet.fireforget('get', key, this._onFetch.bind(this, key, package));
 };
 
-PreHeat.prototype._onFetch = function (key, package, host, err, data) {
+PreHeat.prototype._onFetch = function (key, package, err, data) {
   if (err) { return this.onError(err) }
   if (!err && data) { return this.done() }
 
