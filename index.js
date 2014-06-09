@@ -38,14 +38,20 @@ function PreHeat (options) {
     githulk: this.githulk,
     registry: options.registry
   });
+  this.prefix = '';
 
   this.pagelet = new (Pagelet.extend({
     cache: new Dynamis('redis', this.redis, options.redis),
     registry: this.registry,
-    githulk: this.githulk
+    githulk: this.githulk,
+    key: this.key.bind(this)
   }).optimize());
 
 }
+
+PreHeat.prototype.key = function (name, version) {
+  return this.prefix + Pagelet.prototype.key.call(this, name, version);
+};
 
 //
 // Take the package name, resolve it and its dependencies and cache it.
@@ -56,7 +62,14 @@ PreHeat.prototype.cache = function (package, host, callback) {
     callback = host;
     host = undefined;
   }
-
+  if (host) {
+    this.registry = new Registry({
+      githulk: this.githulk,
+      registry: host
+    });
+    this.prefix += host + ':private:';
+    this.pagelet.registry = this.registry;
+  }
   this._callback = callback && typeof callback === 'function'
     ? callback
     : undefined;
@@ -65,7 +78,7 @@ PreHeat.prototype.cache = function (package, host, callback) {
 };
 
 PreHeat.prototype._onLatest = function (package, host, err, version) {
-  if (err) { return onError(err); }
+  if (err) { return this.onError(err); }
   var key = this.pagelet.key(package, version);
 
   this.pagelet.fireforget('get', key, this._onFetch.bind(this, key, package, host));
@@ -78,7 +91,7 @@ PreHeat.prototype._onFetch = function (key, package, host, err, data) {
   // Allow host to override the registry instance so a new one is created
   // with the proper URL
   this.pagelet.resolve(package, {
-    registry: host || this.registry,
+    registry: this.registry,
     githulk: this.githulk
   }, this._onResolved.bind(this, key));
 };
