@@ -8,7 +8,6 @@ var EE = require('events').EventEmitter,
     Dynamis = require('dynamis'),
     Githulk = require('githulk');
 
-
 module.exports = PreHeat;
 
 util.inherits(PreHeat, EE);
