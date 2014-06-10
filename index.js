@@ -24,7 +24,9 @@ function PreHeat (options) {
   this.options = options;
 
   this.couchdb = new (cradle).Connection(options.couchdb);
-  this.redis = redis.createClient(options.redis.port, options.redis.host,
+  this.redis = options.redis instanceof redis.RedisClient
+    ? options.redis
+    : redis.createClient(options.redis.port, options.redis.host,
                                   { auth_pass: options.redis.auth });
 
   this.githulk = new Githulk({
