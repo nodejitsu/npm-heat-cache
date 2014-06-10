@@ -73,7 +73,7 @@ PreHeat.prototype.cache = function (package, callback) {
 PreHeat.prototype._onLatest = function (package, err, version) {
   if (err) { return this.onError(err); }
   var key = this.pagelet.key(package, version);
-  console.log(key);
+
   this.pagelet.fireforget('get', key, this._onFetch.bind(this, key, package));
 };
 
