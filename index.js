@@ -66,32 +66,42 @@ PreHeat.prototype.cache = function (package, callback) {
     ? callback
     : undefined;
 
-  this.pagelet.latest(package, this._onLatest.bind(this, package));
+  this.latest(package, this._onLatest.bind(this, package));
+};
+
+PreHeat.prototype.latest = function (name, cb) {
+  var key = this.key(name, 'latest');
+  this.registry.packages.get(name + '/latest', function (err, data) {
+    if (err) return cb(err);
+
+    if (Array.isArray(data)) data = data[0];
+
+    this.pagelet.fireforget('set', key, data.version, 0);
+
+    cb(null, data.version);
+
+  }.bind(this));
 };
 
 PreHeat.prototype._onLatest = function (package, err, version) {
   if (err) { return this.onError(err); }
-  var key = this.pagelet.key(package, version);
 
-  this.pagelet.fireforget('get', key, this._onFetch.bind(this, key, package));
+  this.resolve(package, version, this._onResolved.bind(this));
 };
 
-PreHeat.prototype._onFetch = function (key, package, err, data) {
-  if (err) { return this.onError(err) }
-  if (!err && data) { return this.done() }
+PreHeat.prototype.resolve = function (package, version, fn) {
+  var key = this.key(package, version);
 
-  // Allow host to override the registry instance so a new one is created
-  // with the proper URL
   this.pagelet.resolve(package, {
     registry: this.registry,
     githulk: this.githulk
-  }, this._onResolved.bind(this, key));
+  }, fn.bind(this, key));
 };
 
 PreHeat.prototype._onResolved = function (key, err, data) {
   if (err) { return this.onError(err) }
+
   this.pagelet.fireforget('set', key, data,
-                          this.pagelet.expire.data,
                           this.answer.bind(this));
 };
 
