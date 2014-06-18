@@ -75,16 +75,23 @@ PreHeat.prototype.latest = function (name, cb) {
     if (err) return cb(err);
 
     if (Array.isArray(data)) data = data[0];
+    this.pagelet.fireforget('get', key, function (err, version) {
+      if (err) { return cb(err) }
+      // If we have the same version already just skip as we may have crashed
+      // or something
+      if (version === data.version) { return cb(null, null) };
 
-    this.pagelet.fireforget('set', key, data.version, 0);
+      this.pagelet.fireforget('set', key, data.version, 0);
 
-    cb(null, data.version);
+      cb(null, data.version);
+    }.bind(this));
 
   }.bind(this));
 };
 
 PreHeat.prototype._onLatest = function (package, err, version) {
   if (err) { return this.onError(err); }
+  if (!version) return this.done();
 
   this.resolve(package, version, this._onResolved.bind(this));
 };
