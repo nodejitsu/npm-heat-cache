@@ -23,7 +23,7 @@ function PreHeat (options) {
   this.options = options;
 
   this.couchdb = new (cradle).Connection(options.couchdb);
-  this.redis = options.redis instanceof redis.RedisClient
+  this.redis = typeof options.redis.auth === 'function'
     ? options.redis
     : redis.createClient(options.redis.port, options.redis.host,
                                   { auth_pass: options.redis.auth });
