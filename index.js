@@ -23,7 +23,11 @@ function PreHeat (options) {
   this.options = options;
 
   this.couchdb = new (cradle).Connection(options.couchdb);
-  this.redis = typeof options.redis.auth === 'function'
+
+  // Is this a redis instance?
+  var isInstance = typeof options.redis.auth === 'function';
+
+  this.redis = isInstance
     ? options.redis
     : redis.createClient(options.redis.port, options.redis.host,
                                   { auth_pass: options.redis.auth });
@@ -33,7 +37,7 @@ function PreHeat (options) {
     tokens: options.tokens
   });
 
-  this.redis.on('error', this.emit.bind(this, 'error'));
+  if (!isInstance) this.redis.on('error', this.emit.bind(this, 'error'));
 
   this.registry = new Registry({
     githulk: this.githulk,
